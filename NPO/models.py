@@ -59,3 +59,8 @@ class Publication(models.Model):
 class Question(models.Model):
     question_text = models.TextField()
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+
+class FavouriteNews(models.Model):
+    news = models.ForeignKey(News, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)

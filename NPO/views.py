@@ -1,7 +1,9 @@
 from django.db.models import Q
+from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from NPO.models import News, TypeLaw, Law, Publication
+from NPO.models import News, TypeLaw, Law, Publication, FavouriteNews
 from rest_framework.response import Response
 from NPO.serializers import NewsSerializer, NewsDetailSerializer, TypeLawSerializer, LawDetailSerializer, \
     LawsByTypeSerializer, PublicationsByTypeSerializer, PublicationDetailSerializer
@@ -13,7 +15,7 @@ class NewsCreateAPI(APIView, PageNumberPagination):
         news = News.objects.filter(Q(title__icontains=search) |
                                    Q(text__icontains=search))
         results = self.paginate_queryset(news, request, view=self)
-        data = NewsSerializer(results, many=True).data
+        data = NewsSerializer(results, many=True, context={'request': request}).data
         return self.get_paginated_response(data)
 
 
@@ -59,3 +61,24 @@ class PublicationDetailAPI(APIView):
         publication = Publication.objects.get(pk=id)
         data = PublicationDetailSerializer(publication).data
         return Response(data=data)
+
+
+class NewsFavouriteAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        news_id = request.data.get('news_id')
+        try:
+            favourite = FavouriteNews.objects.get(news_id=news_id, user=request.user)
+            print('GET')
+        except:
+            favourite = FavouriteNews.objects.create(news_id=news_id, user=request.user)
+            print('CREATE')
+        favourite.save()
+        return Response(status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        news_id = request.data.get('news_id')
+        favourite = FavouriteNews.objects.filter(news_id=news_id, user=request.user)
+        favourite.delete()
+        return Response(status=status.HTTP_200_OK)

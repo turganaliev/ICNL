@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('news/', views.NewsCreateAPI.as_view()),
     path('news/<int:id>/', views.NewsDetailAPI.as_view()),
+    path('favourite/news/', views.NewsFavouriteAPI.as_view()),
     path('law_types/', views.TypeLawAPI.as_view()),
     path('laws/', views.LawsByTypeAPI.as_view()),
     path('laws/<int:id>/', views.LawDetailAPI.as_view()),
@@ -30,4 +31,6 @@ urlpatterns = [
     path('publications/<int:id>/', views.PublicationDetailAPI.as_view()),
     path('register/', login_views.RegisterView.as_view()),
     path('confirm/', login_views.ConfirmAPIView.as_view())
+
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
